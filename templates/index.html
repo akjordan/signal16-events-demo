@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- HTML5 Hello world by kirupa - http://www.kirupa.com/html5/getting_your_feet_wet_html5_pg1.htm -->
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+
+</head>
+
+<body>
+
+<div class="container">
+<table class="table table-striped">
+    <thead class="thead-inverse">
+    <tr>
+      <th>From</th>
+      <th>Last Event</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+    <tbody>
+<script> 
+// Get a database reference to our posts
+var ref = new Firebase("https://yourfirebaseurl.firebaseio.com/");
+var current_snap
+
+ref.on("child_added", function(snapshot) {
+
+$("<tr id=\'"+snapshot.key()+"\'><td>"+snapshot.val().From+"</td><td>"+snapshot.val().StatusCallbackEvent+"</td><td><button type=\"button\" class=\"btn btn-primary\">Mute</button><button type=\"button\" class=\"btn btn-primary hold-button\">Hold</button><button type=\"button\" class=\"btn btn-primary\">Kick</button></td></tr>").appendTo("tbody");
+
+$('.hold-button').click(function(){
+    console.log("click");
+    var call_sid = $(this).parent().parent().attr('id');
+    console.log(call_sid);
+    $.ajax
+    ({ 
+        url: '/hold',
+        data: {"call_sid": call_sid},
+        type: 'post',
+        success: function(result)
+        {
+          console.log("Sent Hold to", call_sid);
+        }
+    });
+});
+
+});
+
+ref.on("child_changed", function(snapshot) {
+    console.log("changed", snapshot.key());
+$('#'+snapshot.key()+'').replaceWith("<tr id=\'"+snapshot.key()+"\'><td>"+snapshot.val().From+"</td><td>"+snapshot.val().StatusCallbackEvent+"</td><td><button type=\"button\" class=\"btn btn-primary\">Mute</button>   <button type=\"button\" class=\"btn btn-primary hold-button\">Hold</button>   <button type=\"button\" class=\"btn btn-primary\">Kick</button></td></tr>");
+
+$('.hold-button').click(function(){
+    console.log("click");
+    var call_sid = $(this).parent().parent().attr('id');
+    console.log(call_sid);
+    $.ajax
+    ({ 
+        url: '/hold',
+        data: {"call_sid": call_sid},
+        type: 'post',
+        success: function(result)
+        {
+          console.log("Sent Hold to", call_sid);
+        }
+    });
+});
+
+});
+
+ref.on("child_removed", function(snapshot) {
+				$('#'+snapshot.key()+'').remove();
+});
+
+</script>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>
